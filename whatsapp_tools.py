@@ -1,4 +1,5 @@
 import re
+import os
 import datetime
 import pandas as pd
 import matplotlib as mpl
@@ -173,3 +174,35 @@ def word_frequency(messages, words, by='weekday', time_period=[8, 18]):
         messages_df = messages_df.groupby('Time').sum()
 
     return messages_df, by
+
+
+def occult_names(file_path, rewrite=True, occult_group=True, group_name=None):
+    messages = parse_whatsapp_chat(file_path)
+    senders = [msg[2] for msg in messages]
+
+    if group_name is None:
+        group_name = senders[0]
+
+    # List the unique senders
+    senders = list(set(senders))
+    senders.remove(group_name)
+
+    # Replace the sender and group names
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    if occult_group:
+        content = content.replace(group_name, "Group chat")
+
+    for i, sender in enumerate(senders):
+        content = content.replace(sender, f"Person {i}")
+
+    # Write the modified content back to the file
+    if not rewrite:
+        directory_path = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+        file_name = "Copy_of_" + file_name
+        file_path = os.path.join(directory_path, file_name)
+
+    with open(file_path, 'w') as file:
+        file.write(content)

@@ -12,13 +12,12 @@ def sum_of_last(df, n):
     return sum
 
 
-file_path = '/home/pedro/Documentos/Codes/whatsapp_analysis/big_chat.txt'
+file_path = '/path/to/your/file/example.txt'
 messages = wt.parse_whatsapp_chat(file_path)
 messages_df, category = wt.word_frequency(messages,
                                           words=["sim", 'mas', 'n'],
                                           by='weekday',
                                           )
-print(messages_df)
 
 # Plot the stacked graph
 plt.style.use('seaborn-v0_8-colorblind')
@@ -26,7 +25,6 @@ _, ax = plt.subplots(figsize=(10, 6))
 
 for i, column in enumerate(messages_df.columns):
     bottoms = sum_of_last(messages_df, i)
-    print(bottoms)
 
     bars = ax.bar(messages_df.index,
                   messages_df[column],

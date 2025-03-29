@@ -3,7 +3,7 @@ import whatsapp_tools as wt
 
 
 def main():
-    file_path = '/home/pedro/Documentos/Codes/whatsapp_analysis/big_chat.txt'
+    file_path = '/path/to/your/file/example.txt'
     messages = wt.parse_whatsapp_chat(file_path)
     sender_counts = wt.count_messages_by_sender(messages)
 

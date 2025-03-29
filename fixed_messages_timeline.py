@@ -5,7 +5,7 @@ import matplotlib.dates as mdates
 mpl.use('TkAgg')
 
 
-file_path = '/home/pedro/Documentos/Codes/whatsapp_analysis/big_chat.txt'
+file_path = '/path/to/your/file/example.txt'
 messages = wt.parse_whatsapp_chat(file_path)
 df = wt.count_each_sender_date(messages)
 df = df.resample('W').sum()
