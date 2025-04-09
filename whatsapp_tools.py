@@ -7,6 +7,10 @@ from collections import Counter
 
 
 def labels_in_latex():
+    """
+    Configures matplotlib to accept LaTeX equation formats in its titles and
+    legends, setting the font as serif of size 13.
+    """
     # Enable LaTeX rendering
     mpl.rcParams['text.usetex'] = True
 
@@ -18,6 +22,20 @@ def labels_in_latex():
 
 
 def parse_whatsapp_chat(file_path):
+    """
+    Reads a txt file of a group chat and returns a list of tuples, each tuple
+    contains, in order, date, time, sender, message.
+
+    Parameters:
+    file_path (str): The file path of the txt file, can be either a relative
+        path, an absolute path or a pathlib Path Object.
+
+    Returns:
+    list of tuples: Each tuple contains one message found in the file. The
+        message is broken down according to one of the three following
+        whatsapp regular expressions: iOS, Android or POCO. Each tuple has
+        four elements: date, time, sender and message.
+    """
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
@@ -100,12 +118,17 @@ def split_and_count(text, word):
     return count
 
 
-def word_frequency(messages, words, by='weekday', time_period=[8, 18]):
+def word_frequency(messages,
+                   words,
+                   by='weekday',
+                   time_period=[8, 18],
+                   group_name=None):
 
     # Delete system messages
-    original_group_name = messages[0][2]
-    messages = [msg for msg in messages if msg[2] != original_group_name]
+    if group_name is None:
+        group_name = messages[0][2]
 
+    messages = [msg for msg in messages if msg[2] != group_name]
     messages = [msg for msg in messages if 'a été ajouté·e' not in msg[3]]
     messages = [msg for msg in messages if 'a ajouté' not in msg[3]]
 
