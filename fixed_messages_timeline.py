@@ -29,7 +29,7 @@ ax.set_xticklabels(df.index, rotation=45)
 ax.grid(True, alpha=0.7)
 ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 ax.set_xlabel('Data', fontsize=16)
-ax.set_ylabel('Número de mensagens', fontsize=16)
+ax.set_ylabel('Number of messages', fontsize=16)
 
 # Set the major ticks to be at the start of each week
 ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
