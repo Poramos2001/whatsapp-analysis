@@ -142,11 +142,70 @@ def count_word(text, word):
     return count
 
 
+def get_time_range(time_period):
+    """
+    Returns the list of full hours in the 24h system between the two numbers
+    given as input, starting by the first element and ending at the second.
+
+        e.g. get_time_range([22, 3]) --> [22, 23, 0, 1, 2, 3]
+             get_time_range([12, 15]) --> [12, 13, 14, 15]
+    """
+    # Check if the input is correct
+    if len(time_period) != 2:
+        raise ValueError("'time_period' must be a list of two integers.")
+
+    elif not (isinstance(time_period[0], int)
+              and isinstance(time_period[1], int)):
+        raise TypeError("'time_period' must be a list of two integers.")
+
+    elif (min(time_period) < 0 or max(time_period) > 23):
+        raise ValueError("The values within the 'time_period' variable must be"
+                         " between 0 and 23.")
+
+    # Generate the return list
+    if time_period[0] <= time_period[1]:
+        return list(range(time_period[0], time_period[1]+1))
+    else:
+        return list(range(time_period[0], 24)).append(
+                                            list(range(0, time_period[1])))
+
+
 def word_frequency(messages,
                    words,
                    by='weekday',
                    time_period=[8, 18],
                    group_name=None):
+    """
+    Calculates how many times a single word or each word in an iterable of
+    words appears in the messages of the input messages list. The number of
+    appearances of each word is either grouped by the weekday or hour the
+    messages it is in were sent. If chosen by hour, it will be grouped by every
+    hour in the given time period, ignoring the other appearances.
+
+    Parameters:
+        messages (list of tuples): Each tuple contains one message broken down
+            in the following elements: date, time, sender and message.
+
+        words (many): The word(s) meant to be searched, this variable can be a
+            variable or a list/tuple/range of variables of the following types:
+            str, int, float, complex or bool.
+
+        by ('weekday' or 'hour'): Sets if the word(s) will be grouped by
+            weekday or full hour (ignoring minutes and seconds).
+
+        time_period (list of two ints): The number of appearances of words will
+            be calculated for each individual hour within the time period. For
+            further information see whatsapp_tools.get_time_range docstring.
+
+        group_name (str): The group name considered when deleting system
+            messages, if none is provided, the default is using the first
+            sender in the messages list.
+
+    Returns:
+        messages_df (pd.dataframe): time or date is index not column
+
+        by (str): Returns the 'by' input to facilitate histogram plotting.
+    """
     # Delete system messages
     if group_name is None:
         group_name = messages[0][2]
@@ -165,8 +224,7 @@ def word_frequency(messages,
         messages_df = pd.DataFrame(messages, columns=['Time', 'Message'])
         messages_df['Time'] = messages_df['Time'].apply(get_hour)
 
-        # testar se o time period n excede o dia
-        time_range = list(range(time_period[0], time_period[1]+1))
+        time_range = get_time_range(time_period)
         messages_df = messages_df[messages_df['Time'].isin(time_range)]
         messages_df = messages_df.reset_index(drop=True)
 
@@ -199,11 +257,6 @@ def word_frequency(messages,
     messages_df.pop('Message')
 
     if by == 'weekday':
-        # Delete messages without any of the words
-        messages_df = messages_df[
-            (messages_df.drop(columns='Date') != 0).any(axis=1)]
-        messages_df = messages_df.reset_index(drop=True)
-
         # Groups by the weekday
         messages_df['Date'] = messages_df['Date'].apply(get_day_of_week)
         messages_df = messages_df.groupby('Date').sum()
@@ -214,11 +267,6 @@ def word_frequency(messages,
         messages_df = messages_df.reindex(weekday_order).dropna()
 
     elif by == 'hour':
-        # Delete messages without any of the words
-        messages_df = messages_df[
-            (messages_df.drop(columns='Time') != 0).any(axis=1)]
-        messages_df = messages_df.reset_index(drop=True)
-
         # Groups by the full hour
         messages_df = messages_df.groupby('Time').sum()
 
