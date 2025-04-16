@@ -202,7 +202,11 @@ def word_frequency(messages,
             sender in the messages list.
 
     Returns:
-        messages_df (pd.dataframe): time or date is index not column
+        messages_df (pd.dataframe): A dataframe indexed either by hour or
+            weekday (depending on the 'by' parameter), with one column for each
+            entry in the 'words' parameter. Each element is the number of
+            times the word that names the column was sent in the rows
+            weekday/hour.
 
         by (str): Returns the 'by' input to facilitate histogram plotting.
     """
@@ -274,6 +278,28 @@ def word_frequency(messages,
 
 
 def occult_names(file_path, rewrite=True, occult_group=True, group_name=None):
+    """
+    Occults the names of the people who sent each message in a group chat .txt
+    file. The name of each person will become 'Person x', with x going from 0
+    to n-1, n being the number of senders in the file. The file can either be
+    rewritten or crated a copy of. There is also a choice if you want to occult
+    the group name or not.
+
+    Parameters:
+        file_path (str): The file path of the txt file, can be either a
+            relative path, an absolute path or a pathlib Path Object.
+
+        rewrite (bool): Sets if the file will be rewritten or not. If False,
+            the function will create a new file in the same directory named
+            Copy_of_{filename}.
+
+        occult_group (bool): Sets if the group name will be occulted or not.
+            If True, the group name will be changed to 'Group chat', else it
+            will be left as it is and not changed with the other names.
+
+        group_name (str): The name of the group to be changed or kept, if None,
+            the name considered will be that of the first sender.
+    """
     messages = parse_whatsapp_chat(file_path)
     senders = [msg[2] for msg in messages]
 
